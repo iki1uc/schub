@@ -1,104 +1,776 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
-<meta charset="UTF-8">
-<title>U4X · GPU · NC · ULTRA3.0 · ID</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🌀 RESPO‑SCHALTUNG · REPO‑AUSWAHL · KOOP/POOK</title>
 
-<style>
-    body { background:#111; color:#eee; font-family: monospace; padding:20px; }
-    .block { margin-bottom:20px; padding:10px; border:1px solid #444; }
-    input, textarea { width:100%; background:#222; color:#eee; border:1px solid #555; padding:8px; }
-    button { background:#0f0; color:#000; padding:10px 20px; border:none; cursor:pointer; }
-</style>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: radial-gradient(ellipse at 20% 30%, #0a0e1a, #000000);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Segoe UI', 'Consolas', monospace;
+      padding: 10px;
+      color: #c0d0d0;
+    }
+
+    .container {
+      max-width: 1600px;
+      width: 100%;
+      background: rgba(6, 8, 16, 0.6);
+      backdrop-filter: blur(4px);
+      border-radius: 40px;
+      padding: 18px 22px 24px;
+      border: 1px solid rgba(160, 200, 240, 0.05);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9), inset 0 0 80px rgba(100, 180, 255, 0.02);
+    }
+
+    .header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(160, 200, 240, 0.06);
+      padding-bottom: 6px;
+      margin-bottom: 12px;
+    }
+    .header h1 {
+      font-size: 22px;
+      font-weight: 300;
+      letter-spacing: 4px;
+      background: linear-gradient(135deg, #e0e8f0, #b0c8d8, #8098b0, #c0d8e8, #b388ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .header h1 small {
+      font-size: 10px;
+      letter-spacing: 2px;
+      -webkit-text-fill-color: #4a5a6a;
+      color: #4a5a6a;
+    }
+    .status-leds {
+      display: flex;
+      gap: 14px;
+      font-size: 10px;
+      color: #5a7a8a;
+      flex-wrap: wrap;
+    }
+    .status-leds span { display: flex; align-items: center; gap: 4px; }
+    .led {
+      display: inline-block; width: 8px; height: 8px;
+      border-radius: 50%; background: #2a4a5a; transition: 0.3s;
+    }
+    .led.on   { background: #8cf0d0; box-shadow: 0 0 10px #8cf0d0; }
+    .led.pulse{ background: #f0d080; animation: pulse 1.2s infinite; }
+    .led.off  { background: #2a4a5a; }
+    @keyframes pulse { 0%,100%{opacity:0.4;transform:scale(0.8)} 50%{opacity:1;transform:scale(1.2)} }
+
+    .work-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 14px;
+      margin: 8px 0 14px;
+    }
+    @media (max-width: 1200px) {
+      .work-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 800px) {
+      .work-grid { grid-template-columns: 1fr; }
+    }
+
+    .workspace {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 20px;
+      padding: 12px 14px 14px;
+      border: 1px solid rgba(100, 180, 255, 0.03);
+      display: flex;
+      flex-direction: column;
+      min-height: 380px;
+    }
+    .workspace h3 {
+      font-size: 11px;
+      letter-spacing: 2px;
+      border-bottom: 1px solid rgba(100, 180, 255, 0.04);
+      padding-bottom: 4px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .workspace h3 .badge {
+      font-weight: normal;
+      color: #5a7a8a;
+      font-size: 9px;
+    }
+    .ws-module h3 { color: #f0d080; }
+    .ws-repo h3 { color: #70c8ff; }
+    .ws-koop h3 { color: #b388ff; }
+
+    /* Module (links) – wie gehabt */
+    .grid-3x3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      flex: 1;
+    }
+    @media (max-width: 600px) {
+      .grid-3x3 { grid-template-columns: repeat(2, 1fr); }
+    }
+    .modul {
+      background: rgba(10, 14, 20, 0.5);
+      border: 1px solid rgba(100, 180, 255, 0.06);
+      border-radius: 12px;
+      padding: 8px 6px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .modul:hover { border-color: rgba(160, 200, 240, 0.12); transform: translateY(-1px); }
+    .modul .icon { font-size: 22px; line-height: 1.1; }
+    .modul .name { font-size: 10px; font-weight: 500; color: #d0e0e8; }
+    .modul .status-tag {
+      font-size: 6px; padding: 1px 8px; border-radius: 10px;
+      margin: 2px 0 3px; background: rgba(0,0,0,0.2);
+      border: 1px solid transparent; display: inline-block;
+    }
+    .modul .status-tag.stabil { border-color: #8cf0d0; color: #8cf0d0; }
+    .modul .status-tag.beta   { border-color: #f0d080; color: #f0d080; }
+    .modul .status-tag.alpha  { border-color: #ff6b6b; color: #ff6b6b; }
+    .modul .messwert { font-size: 10px; color: #70c8ff; font-weight: bold; }
+    .modul .toggle-switch {
+      display: inline-block; width: 24px; height: 12px;
+      background: #1a2a3a; border-radius: 30px;
+      position: relative; cursor: pointer; transition: 0.2s;
+      border: 1px solid rgba(100,180,255,0.05); margin-top: 2px;
+    }
+    .modul .toggle-switch .knob {
+      width: 8px; height: 8px; background: #4a6a7a;
+      border-radius: 50%; position: absolute;
+      top: 1px; left: 2px; transition: 0.25s;
+    }
+    .modul .toggle-switch.on { background: #1a4a3a; border-color: #8cf0d0; }
+    .modul .toggle-switch.on .knob { left: 13px; background: #8cf0d0; box-shadow: 0 0 8px #8cf0d0; }
+    .modul.koop { border-color: #b388ff !important; box-shadow: 0 0 16px rgba(179,136,255,0.15); }
+    .modul.pook { border-color: #ff6b6b !important; box-shadow: 0 0 16px rgba(255,107,107,0.15); }
+
+    /* Repo-Liste (mitte) */
+    .repo-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px;
+      flex: 1;
+      overflow-y: auto;
+      max-height: 320px;
+    }
+    .repo-item {
+      background: rgba(10, 14, 20, 0.3);
+      border: 1px solid rgba(100, 180, 255, 0.04);
+      border-radius: 8px;
+      padding: 4px 8px;
+      font-size: 9px;
+      color: #8a9aaa;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .repo-item:hover { border-color: rgba(160, 200, 240, 0.15); background: rgba(40,70,90,0.1); }
+    .repo-item .name { color: #b0c8d8; font-weight: 400; }
+    .repo-item .add-btn {
+      background: rgba(0,0,0,0.2);
+      border: 1px solid rgba(100,180,255,0.06);
+      border-radius: 12px;
+      padding: 1px 8px;
+      font-size: 7px;
+      color: #5a7a8a;
+      cursor: pointer;
+    }
+    .repo-item .add-btn:hover { color: #8cf0d0; border-color: #8cf0d0; }
+    .repo-item.added { border-color: #8cf0d0; background: rgba(140,240,208,0.05); }
+
+    /* Koop/Pook (rechts) */
+    .koop-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+    }
+    .koop-panel .pair-row {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      background: rgba(0,0,0,0.15);
+      border-radius: 10px;
+      padding: 6px 10px;
+      border: 1px solid rgba(100,180,255,0.02);
+    }
+    .koop-panel .pair-row .mod-name {
+      font-size: 10px;
+      color: #d0e0e8;
+      min-width: 60px;
+    }
+    .koop-panel .pair-row .mode-badge {
+      font-size: 8px;
+      padding: 1px 8px;
+      border-radius: 12px;
+      background: rgba(0,0,0,0.2);
+    }
+    .koop-panel .pair-row .mode-badge.koop { color: #b388ff; border: 1px solid #b388ff; }
+    .koop-panel .pair-row .mode-badge.pook { color: #ff6b6b; border: 1px solid #ff6b6b; }
+    .koop-panel .pair-row .status-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #2a4a5a;
+    }
+    .koop-panel .pair-row .status-dot.on { background: #8cf0d0; box-shadow: 0 0 8px #8cf0d0; }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin: 4px 0;
+    }
+    button {
+      background: rgba(20, 28, 36, 0.4);
+      border: 1px solid rgba(120, 160, 190, 0.06);
+      color: #9ab0c0;
+      padding: 4px 12px;
+      border-radius: 16px;
+      font-size: 8px;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    button:hover {
+      background: rgba(40, 70, 90, 0.2);
+      border-color: rgba(160, 200, 240, 0.1);
+      color: #d0e8f8;
+    }
+    button.primary { border-color: rgba(255, 215, 0, 0.1); color: #f0d080; }
+    button.primary:hover { background: rgba(255, 215, 0, 0.04); }
+    button.danger { border-color: rgba(255, 80, 80, 0.08); color: #d06060; }
+    button.danger:hover { background: rgba(255, 80, 80, 0.04); }
+    button.koop-btn { border-color: rgba(179, 136, 255, 0.1); color: #b388ff; }
+    button.koop-btn:hover { background: rgba(179, 136, 255, 0.04); }
+    button.pook-btn { border-color: rgba(255, 107, 107, 0.1); color: #ff6b6b; }
+    button.pook-btn:hover { background: rgba(255, 107, 107, 0.04); }
+
+    .log-box {
+      background: rgba(0,0,0,0.2);
+      border-radius: 8px;
+      padding: 4px 10px;
+      font-size: 7px;
+      color: #4a5a6a;
+      max-height: 50px;
+      overflow-y: auto;
+      line-height: 1.4;
+      border: 1px solid rgba(100, 180, 255, 0.02);
+      margin-top: 4px;
+      font-family: 'Consolas', monospace;
+      flex-shrink: 0;
+    }
+    .log-box .entry { border-bottom: 1px solid rgba(100,180,255,0.02); padding: 1px 0; }
+    .log-box .time { color: #2a3a4a; }
+    .log-box .msg { color: #8ab0c0; }
+    .log-box .msg.koop { color: #b388ff; }
+    .log-box .msg.pook { color: #ff6b6b; }
+    .log-box .msg.conn { color: #70c8ff; }
+
+    .footer {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 10px;
+      padding: 4px 12px;
+      background: rgba(0,0,0,0.12);
+      border-radius: 12px;
+      border: 1px solid rgba(100,180,255,0.02);
+      font-size: 8px;
+      color: #3a4a5a;
+    }
+    .footer .gold { color: #f0d080; }
+    .footer .stat { display: flex; align-items: center; gap: 4px; }
+
+    ::-webkit-scrollbar { width: 3px; }
+    ::-webkit-scrollbar-track { background: #080c12; }
+    ::-webkit-scrollbar-thumb { background: #1a2a3a; border-radius: 4px; }
+  </style>
 </head>
 <body>
 
-<h2>U4X · GPU · NC · ULTRA3.0</h2>
+<div class="container">
 
-<div class="block">
-    <h3>ID · CORE</h3>
-    <pre id="idCore"></pre>
+  <div class="header">
+    <h1>🧿 RESPO‑SCHALTUNG <small>REPO‑AUSWAHL · KOOP/POOK</small></h1>
+    <div class="status-leds">
+      <span><span class="led on" id="ledSystem"></span> SYSTEM</span>
+      <span><span class="led" id="ledKoop"></span> KOOP</span>
+      <span><span class="led" id="ledPook"></span> POOK</span>
+    </div>
+  </div>
+
+  <div class="work-grid">
+
+    <!-- 1. Modul-Schalter (links) -->
+    <div class="workspace ws-module">
+      <h3>🔷 MODULE <span class="badge">🔗 <span id="connCount">0</span></span></h3>
+      <div class="grid-3x3" id="modulGrid"></div>
+      <div style="display:flex; gap:10px; margin-top:6px; font-size:8px; color:#5a7a8a; flex-wrap:wrap; justify-content:center;">
+        <span>📊 <span id="footerActive">0</span>/9 aktiv</span>
+        <span>🔗 <span id="footerConns">0</span></span>
+        <span>⚡ <span id="footerScore">0</span></span>
+      </div>
+      <div class="log-box" id="logBoxLeft">
+        <div class="entry"><span class="time">[INIT]</span> <span class="msg conn">Schaltung geladen · 9 Module</span></div>
+      </div>
+    </div>
+
+    <!-- 2. Repo-Auswahl (mitte) -->
+    <div class="workspace ws-repo">
+      <h3>📁 REPOS <span class="badge" id="repoCount">0</span></h3>
+      <div class="repo-grid" id="repoGrid"></div>
+      <div style="display:flex; gap:8px; margin-top:4px; font-size:8px; color:#5a7a8a; flex-wrap:wrap;">
+        <span>Klick = als Modul hinzufügen</span>
+        <button class="primary" id="btnAddRandom">🎲 Zufälliges Repo</button>
+      </div>
+      <div class="log-box" id="logBoxRepo">
+        <div class="entry"><span class="time">[INIT]</span> <span class="msg conn">Repo‑Liste geladen</span></div>
+      </div>
+    </div>
+
+    <!-- 3. Koop/Pook (rechts) -->
+    <div class="workspace ws-koop">
+      <h3>🔄 KOOP · POOK <span class="badge" id="pairCount">0</span></h3>
+      <div class="koop-panel" id="koopPanel">
+        <div style="font-size:8px; color:#5a7a8a; text-align:center; padding:8px 0;">
+          Wähle zwei Module → Klick auf KOOP oder POOK
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="koop-btn" id="btnKoop">🤝 KOOP (sync)</button>
+        <button class="pook-btn" id="btnPook">⚡ POOK (gegensätzlich)</button>
+        <button class="danger" id="btnClearPairs">⟲ Zurücksetzen</button>
+      </div>
+      <div class="log-box" id="logBoxKoop">
+        <div class="entry"><span class="time">[INIT]</span> <span class="msg koop">Koop/Pook‑Modus bereit</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    <span class="stat"><span class="gold">★</span> 9 Module · Repo‑Auswahl · Koop/Pook</span>
+    <span class="stat">⌨️  k=Koop  p=Pook  r=ResetPairs</span>
+    <span class="stat">🔷 <span id="footerActive2">0</span> aktiv</span>
+  </div>
+
 </div>
 
-<div class="block">
-    <h3>U4X Input</h3>
-    <input id="benchInput" placeholder="type raw input...">
-</div>
+<script>
+// ================================================================
+//  RESPO‑SCHALTUNG · REPO‑AUSWAHL · KOOP/POOK
+//  3 Bereiche: Module (links), Repo‑Auswahl (mitte), Koop/Pook (rechts)
+// ================================================================
 
-<div class="block">
-    <h3>U4X Output</h3>
-    <textarea id="benchOutput" rows="6" readonly></textarea>
-</div>
+"use strict";
 
-<div class="block">
-    <h3>GPU / NC Output</h3>
-    <textarea id="gpuOutput" rows="12" readonly></textarea>
-</div>
+// ─── 1. MODUL‑CONFIG (9 Basis‑Module) ──────────────────────────
+const MODULE_CONFIG = [
+  { id: 'api',   icon: '🔌', name: 'API',   status: 'stabil', min: 40, spread: 60 },
+  { id: 'aura',  icon: '✨', name: 'AURA',  status: 'beta',   min: 30, spread: 70 },
+  { id: 'cpu',   icon: '💻', name: 'CPU',   status: 'stabil', min: 10, spread: 90 },
+  { id: 'down',  icon: '⬇️', name: 'DOWN',  status: 'stabil', min: 20, spread: 80 },
+  { id: 'mana',  icon: '🪄', name: 'MANA',  status: 'alpha',  min: 50, spread: 50 },
+  { id: 'rom3',  icon: '💾', name: 'ROM.3', status: 'beta',   min: 10, spread: 90 },
+  { id: 'rom9',  icon: '💿', name: 'ROM.9', status: 'beta',   min: 10, spread: 90 },
+  { id: 'up',    icon: '⬆️', name: 'UP',    status: 'stabil', min: 20, spread: 80 },
+  { id: 'zen',   icon: '🧘', name: 'ZEN',   status: 'alpha',  min: 40, spread: 60 }
+];
 
-<button onclick="RUN_GPU()">RUN GPU PIPE</button>
+// ─── 2. REPO‑LISTE (aus Repo Dashboard.txt, gekürzt auf ~100) ──
+//    (vollständig erweiterbar – hier die ersten 100 aus der Liste)
+const REPO_LIST = [
+  "ROMANTIC", "C81", "POVpiER", "X81", "vec.exp.9to81", "DESAMALATZION",
+  "tmp.tmp", "SOLAR", "olduc", "ram.drive", "ROHR", "roller", "dreieck", "N",
+  "VyVxVz", "i", "E", "d", "CT81RL", "CTRL", "uni.ATOM", "ROM.on", "rum.tmp",
+  "pumpe", "files", "flow", "mai", "grab", "bolt", "rom.drive", "iki1uc",
+  "ANIME", "MASTER.boot.block", "UNIMATRIX", "ruck", "ZACK", "KlicK", "mcfly",
+  "fuel", "ability", "trieb", "last", "ball", "6a6y6out", "HISTORYCHESS",
+  "GOAL", "spieler", "RYCHESS", "DanceLoop", "wieimmer.boot", "respo.boot",
+  "live.boot", "XyX.system", "quick.drive", "TYQ", "OS_CORE", "aniXourYden",
+  "root.boot", "EVO-Ring", "3xi3ix3", "ki3KIme", "ECOTAAL", "DISpatcher",
+  "Axiom-4", "3hoch3", "JOIN", "HDF", "081.tmp", "9hoch9", "SONNE", "TOKIO",
+  "HWP", "NEWADA", "3TH", "NIRWANA", "777", "RESPO-Code-Pipeline", "PATCH",
+  "ROM", "CPU", "RAM", "GPU", "mindMARKT", "MIND.er", "NOAH", "EVOMARKT",
+  "evoMIND", "EVOCHTAAL", "EVOCITY", "ATLANTER", "earn", "TEM-y", "reise",
+  "tmpO", "RIR", "PIPELINE12", "PIPE", "PIPELINE1", "PIPELINE4", "6oi6io6",
+  "9q9q9", "pipeline2", "PIPELINE9", "PIPELINE", "pipeline3", "pipeline6",
+  "STAGE", "OUR", "WETTER", "PIPEBUILD", "ROMAN", "TIETOE", "CONST", "COMIC"
+];
 
-<script type="module">
+// ─── 3. STATE ────────────────────────────────────────────────────
+const modState = {
+  status: {},          // id -> boolean
+  messwerte: {},       // id -> Zahl
+  connections: [],     // [{a, b}]
+  selected: null,
+  score: 0,
+  // Koop/Pook-Paare: { modA, modB, mode: 'koop'|'pook' }
+  pairs: [],
+  // Hinzugefügte Repos als Module (dynamisch)
+  addedRepos: []       // [{id, name, icon, status, min, spread}]
+};
 
-// ---------------------------------------------------------
-// IMPORT MODULES
-// ---------------------------------------------------------
-import { ID_CORE } from "./ID.core.js";
-import { NC_VECTOR_NEXT } from "./NC.vector.next.js";
-import { NC_PRUEFUNG_FIX } from "./NC.pruefung.fix.js";
-import { ULTRA_FUSION } from "./FUSION.fix.js";
-
-// ---------------------------------------------------------
-// SHOW ID
-// ---------------------------------------------------------
-document.getElementById("idCore").innerText =
-    JSON.stringify(ID_CORE, null, 2);
-
-// ---------------------------------------------------------
-// U4X BENCH VIEWER
-// ---------------------------------------------------------
-document.getElementById("benchInput").addEventListener("input", function() {
-    let v = this.value;
-    document.getElementById("benchOutput").value = v;
+// Basis-Module initialisieren
+MODULE_CONFIG.forEach(m => {
+  modState.status[m.id] = true;
+  modState.messwerte[m.id] = m.min + Math.random() * m.spread;
 });
 
-// ---------------------------------------------------------
-// GPU PIPELINE RUN
-// ---------------------------------------------------------
-async function RUN_GPU(){
+// ─── 4. DOM-REFERENZEN ──────────────────────────────────────────
+const dom = {
+  modulGrid: document.getElementById('modulGrid'),
+  repoGrid: document.getElementById('repoGrid'),
+  koopPanel: document.getElementById('koopPanel'),
+  connCount: document.getElementById('connCount'),
+  footerActive: document.getElementById('footerActive'),
+  footerActive2: document.getElementById('footerActive2'),
+  footerConns: document.getElementById('footerConns'),
+  footerScore: document.getElementById('footerScore'),
+  ledSystem: document.getElementById('ledSystem'),
+  ledKoop: document.getElementById('ledKoop'),
+  ledPook: document.getElementById('ledPook'),
+  logLeft: document.getElementById('logBoxLeft'),
+  logRepo: document.getElementById('logBoxRepo'),
+  logKoop: document.getElementById('logBoxKoop'),
+  repoCount: document.getElementById('repoCount'),
+  pairCount: document.getElementById('pairCount')
+};
 
-    // 1) U4X INPUT
-    const u4x = document.getElementById("benchInput").value || "EMPTY";
-
-    // 2) NC VECTOR (4-0-1-2-9-∞)
-    const vector = NC_VECTOR_NEXT(
-        u4x,
-        "KI-KERN",
-        "DA-START",
-        "NE-FEHLER",
-        "BEN-VOLLENDUNG"
-    );
-
-    // 3) NC PRÜFUNG FIX
-    const check = NC_PRUEFUNG_FIX();
-
-    // 4) ULTRA3.0 FUSION
-    const fusion = ULTRA_FUSION(u4x);
-
-    // 5) OUTPUT
-    const out = {
-        id: ID_CORE,
-        u4x_input: u4x,
-        vector,
-        check,
-        fusion,
-        gpu_state: "GPU-PIPELINE-READY"
-    };
-
-    document.getElementById("gpuOutput").value =
-        JSON.stringify(out, null, 2);
+// ─── 5. MODUL‑LOGIK ──────────────────────────────────────────────
+function getModuleName(id) {
+  const all = [...MODULE_CONFIG, ...modState.addedRepos];
+  const m = all.find(x => x.id === id);
+  return m ? m.name : id;
 }
 
-</script>
+function getAllModules() {
+  return [...MODULE_CONFIG, ...modState.addedRepos];
+}
 
+function logLeft(msg, type = 'conn') {
+  const cls = ['conn', 'koop', 'pook'].includes(type) ? type : 'conn';
+  const time = new Date().toLocaleTimeString();
+  dom.logLeft.innerHTML += `<div class="entry"><span class="time">[${time}]</span> <span class="msg ${cls}">${msg}</span></div>`;
+  dom.logLeft.scrollTop = dom.logLeft.scrollHeight;
+  while (dom.logLeft.children.length > 20) dom.logLeft.removeChild(dom.logLeft.firstChild);
+}
+
+function logRepo(msg, type = 'conn') {
+  const time = new Date().toLocaleTimeString();
+  dom.logRepo.innerHTML += `<div class="entry"><span class="time">[${time}]</span> <span class="msg conn">${msg}</span></div>`;
+  dom.logRepo.scrollTop = dom.logRepo.scrollHeight;
+  while (dom.logRepo.children.length > 20) dom.logRepo.removeChild(dom.logRepo.firstChild);
+}
+
+function logKoop(msg, type = 'koop') {
+  const cls = ['koop', 'pook'].includes(type) ? type : 'koop';
+  const time = new Date().toLocaleTimeString();
+  dom.logKoop.innerHTML += `<div class="entry"><span class="time">[${time}]</span> <span class="msg ${cls}">${msg}</span></div>`;
+  dom.logKoop.scrollTop = dom.logKoop.scrollHeight;
+  while (dom.logKoop.children.length > 20) dom.logKoop.removeChild(dom.logKoop.firstChild);
+}
+
+function toggleModule(id) {
+  modState.status[id] = !modState.status[id];
+  const isOn = modState.status[id];
+  if (!isOn) {
+    modState.connections = modState.connections.filter(c => c.a !== id && c.b !== id);
+    if (modState.selected === id) modState.selected = null;
+    logLeft(`⛔ ${getModuleName(id)} aus · Verbindungen gelöscht`, 'conn');
+  } else {
+    const all = getAllModules();
+    const cfg = all.find(m => m.id === id);
+    if (cfg) modState.messwerte[id] = cfg.min + Math.random() * cfg.spread;
+    logLeft(`✅ ${getModuleName(id)} an`, 'conn');
+  }
+  // Koop/Pook-Paare prüfen und synchronisieren
+  syncPairs();
+  renderModules();
+  updateStats();
+}
+
+function handleModuleClick(id) {
+  if (!modState.status[id]) {
+    logLeft(`⚠️ ${getModuleName(id)} ist aus`, 'conn');
+    return;
+  }
+  if (modState.selected === null) {
+    modState.selected = id;
+    logLeft(`🔗 ${getModuleName(id)} ausgewählt`, 'conn');
+    renderModules();
+    return;
+  }
+  if (modState.selected === id) {
+    modState.selected = null;
+    logLeft('↩️ Auswahl aufgehoben', 'conn');
+    renderModules();
+    return;
+  }
+  const a = modState.selected, b = id;
+  const idx = modState.connections.findIndex(c => (c.a === a && c.b === b) || (c.a === b && c.b === a));
+  if (idx >= 0) {
+    modState.connections.splice(idx, 1);
+    logLeft(`🔗 Verbindung ${getModuleName(a)} ↔ ${getModuleName(b)} getrennt`, 'conn');
+  } else {
+    modState.connections.push({ a, b });
+    logLeft(`🔗 Verbindung ${getModuleName(a)} ↔ ${getModuleName(b)} hergestellt`, 'conn');
+    modState.score += 5;
+  }
+  modState.selected = null;
+  renderModules();
+  updateStats();
+}
+
+function renderModules() {
+  const grid = dom.modulGrid;
+  grid.innerHTML = '';
+  const all = getAllModules();
+  all.forEach(mod => {
+    const isOn = modState.status[mod.id] ?? true;
+    const wert = modState.messwerte[mod.id] ?? 0;
+    const isSelected = modState.selected === mod.id;
+    const isKoop = modState.pairs.some(p => (p.modA === mod.id || p.modB === mod.id) && p.mode === 'koop');
+    const isPook = modState.pairs.some(p => (p.modA === mod.id || p.modB === mod.id) && p.mode === 'pook');
+    const div = document.createElement('div');
+    div.className = 'modul' + (isSelected ? ' ausgewaehlt' : '') + (isKoop ? ' koop' : '') + (isPook ? ' pook' : '');
+    div.innerHTML = `
+      <div class="icon">${mod.icon || '📁'}</div>
+      <div class="name">${mod.name}</div>
+      <div class="status-tag ${mod.status || 'beta'}">${(mod.status || 'beta').toUpperCase()}</div>
+      <div class="messwert">${Math.round(wert)}%</div>
+      <div class="toggle-switch ${isOn ? 'on' : ''}"><div class="knob"></div></div>
+      <div class="conn-bar" id="conn-${mod.id}" style="font-size:7px;color:#445555;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></div>
+    `;
+    div.querySelector('.toggle-switch').addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleModule(mod.id);
+    });
+    div.addEventListener('click', (e) => {
+      if (e.target.closest('.toggle-switch')) return;
+      handleModuleClick(mod.id);
+    });
+    grid.appendChild(div);
+  });
+
+  // Verbindungsbalken
+  all.forEach(mod => {
+    const el = document.getElementById(`conn-${mod.id}`);
+    if (!el) return;
+    const partners = modState.connections
+      .filter(c => c.a === mod.id || c.b === mod.id)
+      .map(c => getModuleName(c.a === mod.id ? c.b : c.a));
+    el.innerHTML = partners.length ? '🔗 ' + partners.join(' · ') : '';
+  });
+  updateStats();
+}
+
+function updateStats() {
+  const all = getAllModules();
+  const active = all.filter(m => modState.status[m.id] !== false).length;
+  const conns = modState.connections.length;
+  dom.connCount.textContent = conns;
+  dom.footerActive.textContent = active;
+  dom.footerActive2.textContent = active;
+  dom.footerConns.textContent = conns;
+  dom.footerScore.textContent = modState.score;
+  dom.ledSystem.className = 'led ' + (active > 0 ? 'on' : 'off');
+}
+
+// ─── 6. REPO‑AUSWAHL ─────────────────────────────────────────────
+function renderRepos() {
+  const grid = dom.repoGrid;
+  grid.innerHTML = '';
+  const addedIds = modState.addedRepos.map(r => r.id);
+  REPO_LIST.forEach(repoName => {
+    const isAdded = addedIds.includes(repoName);
+    const div = document.createElement('div');
+    div.className = 'repo-item' + (isAdded ? ' added' : '');
+    div.innerHTML = `
+      <span class="name">${repoName}</span>
+      <span class="add-btn">${isAdded ? '✓' : '+'}</span>
+    `;
+    div.addEventListener('click', () => {
+      if (isAdded) return;
+      addRepoAsModule(repoName);
+    });
+    grid.appendChild(div);
+  });
+  dom.repoCount.textContent = REPO_LIST.length;
+}
+
+function addRepoAsModule(name) {
+  if (modState.addedRepos.some(r => r.id === name)) return;
+  const newMod = {
+    id: name,
+    icon: '📁',
+    name: name,
+    status: 'beta',
+    min: 20,
+    spread: 80
+  };
+  modState.addedRepos.push(newMod);
+  modState.status[name] = true;
+  modState.messwerte[name] = newMod.min + Math.random() * newMod.spread;
+  logRepo(`📁 Repo "${name}" als Modul hinzugefügt`);
+  renderRepos();
+  renderModules();
+  updateStats();
+}
+
+document.getElementById('btnAddRandom').addEventListener('click', () => {
+  const available = REPO_LIST.filter(r => !modState.addedRepos.some(a => a.id === r));
+  if (available.length === 0) { logRepo('⚠️ Alle Repos bereits hinzugefügt'); return; }
+  const random = available[Math.floor(Math.random() * available.length)];
+  addRepoAsModule(random);
+});
+
+// ─── 7. KOOP / POOK ──────────────────────────────────────────────
+function syncPairs() {
+  const all = getAllModules();
+  modState.pairs.forEach(pair => {
+    const aOn = modState.status[pair.modA] !== false;
+    const bOn = modState.status[pair.modB] !== false;
+    if (pair.mode === 'koop') {
+      // Beide gleich schalten
+      if (aOn !== bOn) {
+        if (aOn) toggleModule(pair.modB);
+        else toggleModule(pair.modA);
+      }
+    } else if (pair.mode === 'pook') {
+      // Gegensätzlich
+      if (aOn === bOn) {
+        if (aOn) toggleModule(pair.modB);
+        else toggleModule(pair.modA);
+      }
+    }
+  });
+  renderKoopPanel();
+}
+
+function renderKoopPanel() {
+  const panel = dom.koopPanel;
+  if (modState.pairs.length === 0) {
+    panel.innerHTML = `<div style="font-size:8px; color:#5a7a8a; text-align:center; padding:8px 0;">
+      Wähle zwei Module → Klick auf KOOP oder POOK
+    </div>`;
+    dom.pairCount.textContent = '0';
+    return;
+  }
+  panel.innerHTML = '';
+  modState.pairs.forEach((pair, idx) => {
+    const div = document.createElement('div');
+    div.className = 'pair-row';
+    const aName = getModuleName(pair.modA);
+    const bName = getModuleName(pair.modB);
+    const modeLabel = pair.mode === 'koop' ? '🤝 KOOP' : '⚡ POOK';
+    const modeCls = pair.mode === 'koop' ? 'koop' : 'pook';
+    const aOn = modState.status[pair.modA] !== false;
+    const bOn = modState.status[pair.modB] !== false;
+    div.innerHTML = `
+      <span class="mod-name">${aName}</span>
+      <span style="color:#5a7a8a;font-size:7px;">↔</span>
+      <span class="mod-name">${bName}</span>
+      <span class="mode-badge ${modeCls}">${modeLabel}</span>
+      <span class="status-dot ${aOn ? 'on' : ''}"></span>
+      <span class="status-dot ${bOn ? 'on' : ''}"></span>
+      <button class="danger" style="font-size:6px;padding:1px 6px;margin-left:auto;" data-pairidx="${idx}">✕</button>
+    `;
+    div.querySelector('button').addEventListener('click', () => {
+      modState.pairs.splice(idx, 1);
+      renderKoopPanel();
+      renderModules();
+      updateStats();
+      logKoop(`⟲ Paar ${aName} ↔ ${bName} entfernt`, 'koop');
+    });
+    panel.appendChild(div);
+  });
+  dom.pairCount.textContent = modState.pairs.length;
+  dom.ledKoop.className = 'led ' + (modState.pairs.some(p => p.mode === 'koop') ? 'on' : '');
+  dom.ledPook.className = 'led ' + (modState.pairs.some(p => p.mode === 'pook') ? 'on' : '');
+}
+
+function createPair(mode) {
+  // Zwei Module auswählen (die aktuell nicht in einem Pair sind)
+  const all = getAllModules();
+  const usedInPairs = new Set();
+  modState.pairs.forEach(p => { usedInPairs.add(p.modA); usedInPairs.add(p.modB); });
+  const available = all.filter(m => !usedInPairs.has(m.id) && modState.status[m.id] !== false);
+  if (available.length < 2) {
+    logKoop(`⚠️ Nicht genug freie Module für ${mode.toUpperCase()} (mind. 2 benötigt)`, 'pook');
+    return;
+  }
+  // Zwei zufällige auswählen
+  const shuffled = available.sort(() => Math.random() - 0.5);
+  const a = shuffled[0], b = shuffled[1];
+  modState.pairs.push({ modA: a.id, modB: b.id, mode: mode });
+  logKoop(`🔗 ${mode.toUpperCase()} · ${a.name} ↔ ${b.name}`, mode);
+  renderKoopPanel();
+  renderModules();
+  updateStats();
+  syncPairs();
+}
+
+document.getElementById('btnKoop').addEventListener('click', () => createPair('koop'));
+document.getElementById('btnPook').addEventListener('click', () => createPair('pook'));
+document.getElementById('btnClearPairs').addEventListener('click', () => {
+  modState.pairs = [];
+  renderKoopPanel();
+  renderModules();
+  updateStats();
+  logKoop('⟲ Alle Paare zurückgesetzt', 'koop');
+});
+
+// ─── 8. TASTATUR ──────────────────────────────────────────────────
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'k' || e.key === 'K') createPair('koop');
+  if (e.key === 'p' || e.key === 'P') createPair('pook');
+  if (e.key === 'r' || e.key === 'R') {
+    modState.pairs = [];
+    renderKoopPanel();
+    renderModules();
+    updateStats();
+    logKoop('⟲ Alle Paare zurückgesetzt (Taste)', 'koop');
+  }
+});
+
+// ─── 9. INIT ──────────────────────────────────────────────────────
+renderRepos();
+renderModules();
+updateStats();
+renderKoopPanel();
+logLeft('🔷 9 Basis‑Module + Repos dynamisch hinzufügbar', 'conn');
+logRepo('📁 ' + REPO_LIST.length + ' Repos zum Hinzufügen verfügbar');
+logKoop('⌨️  k=Koop  p=Pook  r=ResetPairs', 'koop');
+
+// Auto-Start: Ein paar Repos als Demo hinzufügen
+setTimeout(() => {
+  const demo = ['ROMANTIC', 'C81', 'POVpiER', 'X81', 'RESPO-Code-Pipeline'];
+  demo.forEach(name => {
+    if (!modState.addedRepos.some(r => r.id === name)) {
+      addRepoAsModule(name);
+    }
+  });
+  logLeft('✨ Demo‑Repos hinzugefügt: ' + demo.join(', '), 'conn');
+}, 300);
+</script>
 </body>
 </html>
